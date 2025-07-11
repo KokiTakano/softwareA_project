@@ -20,9 +20,9 @@ public class CheckOutControl {
     }
 
     public CheckInOutResponse processAccounting(CheckInOutRequest request) {
-        Optional<Reservation> reservationOpt = dataStore.findReservationById(request.getReservationId());
+        Optional<Reservation> reservationOpt = dataStore.findCheckedInReservationByRoomNumber(request.getRoomNumber());
         if (!reservationOpt.isPresent()) {
-            return new CheckInOutResponse(false, "予約が見つかりません。");
+            return new CheckInOutResponse(false, "指定された部屋は利用されていません。");
         }
         Reservation reservation = reservationOpt.get();
 
@@ -36,7 +36,7 @@ public class CheckOutControl {
     }
 
     public CheckInOutResponse processCheckOut(CheckInOutRequest request, BigDecimal amountPaid) {
-        Optional<Reservation> reservationOpt = dataStore.findReservationById(request.getReservationId());
+        Optional<Reservation> reservationOpt = dataStore.findCheckedInReservationByRoomNumber(request.getRoomNumber());
         if (!reservationOpt.isPresent()) {
             return new CheckInOutResponse(false, "予約が見つかりません。");
         }
@@ -49,7 +49,7 @@ public class CheckOutControl {
         BigDecimal amountDueToPay = accountingInfo.getAmountDue();
 
         if (amountPaid.compareTo(amountDueToPay) < 0) {
-            return new CheckInOutResponse(false, "支払い金額が不足しています。未払い額: " + amountDueToPay.subtract(amountPaid));
+            return new CheckInOutResponse(false, "支払い金額が不足しています。未払い額は" + amountDueToPay.subtract(amountPaid) + "円です。");
         }
 
         Optional<Payment> existingPaymentOpt = dataStore.findPaymentByReservationId(reservation.getReservationId());
@@ -72,6 +72,10 @@ public class CheckOutControl {
             dataStore.saveRoom(room);
         }
 
-        return new CheckInOutResponse(true, "チェックアウトが完了しました。");
+        if(amountPaid.compareTo(amountDueToPay) == 0){
+            return new CheckInOutResponse(true, "ちょうどお預かりしました。お釣りはありません。");
+        }else{
+            return new CheckInOutResponse(true, "お釣りは" + amountPaid.subtract(amountDueToPay) + "円になります。");
+        }
     }
 }

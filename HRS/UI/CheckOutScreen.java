@@ -17,13 +17,13 @@ public class CheckOutScreen {
 
     public void startCheckOutProcess() {
         System.out.println("\n--- チェックアウトを開始します ---");
-        System.out.print("予約番号を入力してください: ");
-        String reservationId = scanner.nextLine();
+        //System.out.print("予約番号を入力してください: ");
+        //String reservationId = scanner.nextLine();
         System.out.print("部屋番号を入力してください: ");
         int roomNumber = scanner.nextInt();
         scanner.nextLine();
 
-        CheckInOutRequest request = new CheckInOutRequest(reservationId, roomNumber);
+        CheckInOutRequest request = new CheckInOutRequest(null, roomNumber);
 
         CheckInOutResponse accountingResponse = checkOutControl.processAccounting(request);
         if (!accountingResponse.isSuccess()) {
@@ -44,7 +44,8 @@ public class CheckOutScreen {
                 
                 CheckInOutResponse checkOutResponse = checkOutControl.processCheckOut(request, amountPaid);
                 if (checkOutResponse.isSuccess()) {
-                    System.out.println("チェックアウトが完了しました。");
+                    System.out.println(checkOutResponse.getMessage());
+                    System.out.println("チェックアウトは完了です。");
                 } else {
                     System.out.println("チェックアウト失敗: " + checkOutResponse.getMessage());
                 }
@@ -55,7 +56,7 @@ public class CheckOutScreen {
             System.out.println("未払い額はありません。チェックアウトを進めます。");
             CheckInOutResponse checkOutResponse = checkOutControl.processCheckOut(request, BigDecimal.ZERO);
             if (checkOutResponse.isSuccess()) {
-                System.out.println("チェックアウトが完了しました。");
+                System.out.println("チェックアウトは完了です。");
             } else {
                 System.out.println("チェックアウト失敗: " + checkOutResponse.getMessage());
             }

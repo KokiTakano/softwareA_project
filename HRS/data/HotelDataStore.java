@@ -81,6 +81,27 @@ public class HotelDataStore {
         reservations.put(reservation.getReservationId(), reservation);
     }
 
+    public Optional<Reservation> findCheckedInReservationByRoomNumber(int roomNumber) {
+        // 1. 指定された部屋番号の部屋を取得
+        Optional<Room> roomOpt = findRoomByRoomNumber(roomNumber);
+        if (!roomOpt.isPresent()) {
+            return Optional.empty(); // 部屋が見つからない
+        }
+        Room room = roomOpt.get();
+
+        // 2. その部屋が「使用中」であることを確認
+        if (room.getStatus() != Room.RoomStatus.OCCUPIED) {
+            // 使用中でない場合、チェックアウト対象の予約はない
+            return Optional.empty();
+        }
+
+        // 3. その部屋に紐づく、現在「CHECKED_IN」状態の予約を探す
+        return reservations.values().stream()
+                           .filter(r -> r.getReservedRoom().getRoomNumber() == roomNumber)
+                           .filter(r -> r.getStatus() == Reservation.ReservationStatus.CHECKED_IN)
+                           .findFirst();
+    }
+
     // --- Paymentに関する操作 ---
     public Optional<Payment> findPaymentById(String paymentId) {
         return Optional.ofNullable(payments.get(paymentId));

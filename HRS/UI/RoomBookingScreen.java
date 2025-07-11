@@ -7,6 +7,7 @@ import HRS.dto.RoomSearchRequest;
 import HRS.dto.RoomTypeResult;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -23,7 +24,19 @@ public class RoomBookingScreen {
         System.out.println("--- 部屋予約を開始します ---");
 
         System.out.print("チェックイン日 (YYYY-MM-DD): ");
-        LocalDate checkInDate = LocalDate.parse(scanner.nextLine());
+        LocalDate checkInDate;
+        try{
+            checkInDate = LocalDate.parse(scanner.nextLine());
+        } catch (DateTimeParseException e){
+            System.err.println("エラー: チェックイン日の形式が正しくありません。YYYY-MM-DD形式で入力してください。");
+            return; // エラーが発生したため、ここでメソッドを終了
+        }
+
+        if(checkInDate.isBefore(LocalDate.now())){
+            System.err.println("エラー: 過去の日付が選択されました。今日以降の日付を入力してください。");
+            return; // エラーが発生したため、ここでメソッドを終了
+        }
+
         System.out.print("宿泊日数: ");
         int stayDays = Integer.parseInt(scanner.nextLine());
 
@@ -41,10 +54,10 @@ public class RoomBookingScreen {
         System.out.println("\n--- 利用可能な部屋の種類 ---");
         for (int i = 0; i < availableRoomTypes.size(); i++) {
             RoomTypeResult result = availableRoomTypes.get(i);
-            System.out.println((i + 1) + ". 種類:" + result.getRoomType() + ", 空き部屋数:" + result.getAvailableCount());
+            System.out.println((i + 1) + ". 種類:" + result.getRoomType() + "(" + (i + 1) + "), 空き部屋数:" + result.getAvailableCount());
         }
 
-        System.out.print("予約したい部屋の種類を選択してください (1:普通の部屋 2:スイートルーム): ");
+        System.out.print("予約したい部屋の種類の番号を選択してください: ");
         int choice = Integer.parseInt(scanner.nextLine()) - 1;
 
         if (choice < 0 || choice >= availableRoomTypes.size()) {
