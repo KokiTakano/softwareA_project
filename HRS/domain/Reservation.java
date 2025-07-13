@@ -13,10 +13,10 @@ public class Reservation {
     private BigDecimal totalAmount; // 総額
 
     public enum ReservationStatus {
-        PENDING,    // 保留中
         CONFIRMED,  // 予約確定済み
         CHECKED_IN, // チェックイン済み
         CHECKED_OUT,// チェックアウト済み
+        CANCEL;     // キャンセル
     }
 
     public Reservation(String reservationId, Room reservedRoom, LocalDate checkInDate, int stayDurationDays, BigDecimal totalAmount) {
@@ -25,7 +25,7 @@ public class Reservation {
         this.checkInDate = checkInDate;
         this.stayDurationDays = stayDurationDays;
         this.totalAmount = totalAmount;
-        this.status = ReservationStatus.PENDING; // 初期状態は保留
+        this.status = ReservationStatus.CONFIRMED;
     }
 
     // Getter methods
@@ -72,5 +72,9 @@ public class Reservation {
         this.status = ReservationStatus.CHECKED_OUT;
         // 部屋の状態は清掃中などに更新される想定だが、ここではシンプルに空室にするか、別の処理に任せる
         // this.reservedRoom.setStatusToVacant(); // チェックアウト後の清掃は別プロセスと仮定
+    }
+
+    public void setReservationCancel() {
+        this.status = ReservationStatus.CANCEL;
     }
 }

@@ -45,4 +45,9 @@ public class CheckInControl {
         Optional<Reservation> reservationOpt = dataStore.findReservationById(request.getReservationId());
         return reservationOpt.map(Reservation::getReservationInfo).orElse("予約情報が見つかりません。");
     }
+
+    public String getReservationStatusInfo(CheckInOutRequest request) {
+        Optional<Reservation> reservationOpt = dataStore.findReservationById(request.getReservationId());
+        return reservationOpt.map(r -> r.getStatus().name()).orElse("予約情報が見つかりません。");
+    }
 }

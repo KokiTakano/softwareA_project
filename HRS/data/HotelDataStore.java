@@ -68,7 +68,7 @@ public class HotelDataStore {
 
         return reservations.values().stream()
                 .filter(r -> r.getReservedRoom().getRoomNumber() == room.getRoomNumber())
-                .filter(r -> r.getStatus() != Reservation.ReservationStatus.CHECKED_OUT)
+                .filter(r -> r.getStatus() == Reservation.ReservationStatus.CONFIRMED || r.getStatus() == Reservation.ReservationStatus.CHECKED_IN)
                 .filter(r -> {
                     LocalDate existingReservationEnd = r.getCheckInDate().plusDays(r.getStayDurationDays() - 1);
                     // 期間が重複しない条件: (既存予約の終了 < 希望期間の開始) OR (希望期間の終了 < 既存予約の開始)
